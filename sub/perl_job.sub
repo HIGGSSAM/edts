@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#SBATCH --job-name="perl5"
+#SBATCH --nodes=1
+#SBATCH --mem=185G
+#SBATCH --ntasks-per-node=28
+#SBATCH --time=7-00:00:00
+##SBATCH -o slurm.%N.%A_%a.out
+##SBATCH -e slurm.%N.%A_%a.err
+#SBATCH --partition=shared
+
+cd $SLURM_SUBMIT_DIR
+
+module load Perl/5.24.0-GCC-5.4.0-2.26
+
+perl $1
+

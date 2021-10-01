@@ -1,0 +1,35 @@
+#!/bin/bash
+
+###### Gaussian Array submission.
+
+# round #num file that contains a list of all conformers to be submitted
+
+inp=$(cat $1);
+length=$(cat $1 | wc -l)
+
+# remove sub array txt file. 
+rm -f ./g16/g16_array.txt
+
+# remove dep job id  txt file. 
+rm -f ./g16/job_id.txt
+
+# for each inputted conformer
+for x in $inp;
+do
+    # print out command line to new sub file
+    echo "$x";
+    echo 'g16 -c="0-27" < '$2'/g16/'$x'.gjf > '$2'/g16/'$x'.out' >> ./g16/g16_array.txt
+done
+
+# submitting gaussian array job
+sbatch --array=1-"$length" $2/sub/g16_array.sub $2/g16/g16_array.txt > $2/g16/job_id.txt
+
+###### Dependant perl script submission.
+
+# dependant job to be run after array of conformers is completed
+
+# save dependant array job id to $dep variable
+dep=$(cat ./g16/job_id.txt | cut -d " " -f 4)
+echo $dep
+
+sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $3

@@ -1,0 +1,71 @@
+# Energy-direct Tree Search
+
+Version 1.0.0
+
+Roth Group. Department of Chemistry: p.roth@surrey.ac.uk.
+
+Author: Samuel James Higgs: s.higgs@surrey.ac.uk.
+
+ConfMaker.f is the fortran program to generate a full conformational space.
+
+EDTS_autorun_part1-3.pl are perl scripts to implement the Energy-direct tree search (EDTS) algorithm to explore the comformational space of molecule and idetify the global minimum conformer.
+
+__DISCLAMIER__
+
+The following Scripts are edited, updated and bug fixed versions of two seperate scripts; ConfMaker.f and Confsearch.pl.  
+
+Original Author(s): C.Y. Lin, E.I. Izgorodina, D. Brittain, and K. Zhang
+
+Original script can be found at: https://rsc.anu.edu.au/~mcoote/scripts.php
+   
+When using this codes please using the following citation: E. I. Izgorodina , C.Y. Lin, M. L. Coote. Phys. Chem. Chem. Phys. 9, 2507 (2007)
+
+## Compatibility
+
+Program | Version 
+--------- | ----------
+Slurm Workload Manager | == 17.02.1-2
+Gaussian | == 16
+gcc | >= 5.4.0-2.26
+perl | == 5.24.0
+
+* Support for GAMESS, NWChem and orca is currently unavailable.
+
+## Installation 
+
+Installation can be done through cloning either with HTTPS or SSH. 
+
+``` shell
+git clone https://gitlab.eps.surrey.ac.uk/m15631/edts.git
+cd EDTS
+```
+## Usage 
+
+### ConfMaker.f
+
+``` shell
+# load in the gcc module (the GNU Compiler Collection; https://gcc.gnu.org/)
+module load GCC/7.1.0-2.28
+
+# to compile fortran code
+gfortran ConfMaker.f -O3 -o ./ConfMaker -ffixed-line-length-132
+
+# to execute
+$ ./ConfMaker $mol
+```
+* This requires the optimised geometry in a zmat format and saved as $mol.zmat and a $mol.input file containing all the desired rotated diheral angles.
+* the .input Formate can be found in ConfMaker.f
+
+### EDTS_autorun_part1-3.pl
+
+``` shell
+# load in the perl compiler
+module load Perl/5.24.0-GCC-5.4.0-2.26
+
+# change the mode of all perl scripts to executables from within the directory contain EDTS perl scripts.
+chmod +x *.pl
+
+# to execute
+./EDTS_autorun_part1.pl $mol 
+```
+* all data files should be saved in the subdirectory ./g16

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#SBATCH --job-name="G16-AVX"
+#SBATCH --nodes=1
+#SBATCH --mem=185G
+#SBATCH --ntasks-per-node=28
+#SBATCH --time=7-00:00:00
+##SBATCH -o slurm.%N.%A_%a.out
+##SBATCH -e slurm.%N.%A_%a.err
+#SBATCH --partition=shared
+
+cd $SLURM_SUBMIT_DIR
+
+module load gaussian/16-avx
+
+#SET YOUR GUASSIAN SCRATCH DIR ON THE BEEGFS
+export GAUSS_SCRDIR=/users/$USER/parallel_scratch
+
+bash -c $(head -n $SLURM_ARRAY_TASK_ID $1 | tail -n 1)
