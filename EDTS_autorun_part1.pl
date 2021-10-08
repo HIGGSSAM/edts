@@ -67,9 +67,12 @@ $|++;
 #
 ######################################################################################
 
+use Term::ANSIColor;
+#print color 'blue';
 print "###################################################################################\n"; 
 print "#                                        EDTS                                     #\n";
-print "###################################################################################\n"; 
+print "###################################################################################\n\n"; 
+#print color 'reset';
 
 # Defaults
 $Nmax = 5;  # Default
@@ -106,17 +109,20 @@ if ($ARGV[1]){
 }
 chomp($mol);
 
-
 print "\n";
 print "Conformer search for $mol.\n";
 print "\n";
 
-use Cwd;
-# path to gaussian file directory
-$DataDir = getcwd;
-$DataDir = "$DataDir/g16";
+use Cwd 'abs_path';
+use File::Basename;
+
 # path to directory containing all edts scripts
-$CmdDir = getcwd; 
+my $CmdFile = abs_path(__FILE__);
+my $CmdDir = dirname($CmdFile);
+#$CmdDir = getcwd; 
+
+# path to gaussian file directory
+$DataDir = "$CmdDir/g16";
 
 #print "$DataDir\n";
 #print "$CmdDir\n";
@@ -124,9 +130,11 @@ $CmdDir = getcwd;
 ###################################################################################
 #                                       Round1                                    #
 ###################################################################################
+#print color 'green';
 print "###################################################################################\n"; 
 print "#                                       Round1                                    #\n";
 print "###################################################################################\n"; 
+#print color 'reset';
 
 # create a list of individual rotations for first round of optimisation
 $file = "$DataDir/CF-$mol.round1";

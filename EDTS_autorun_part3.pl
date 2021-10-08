@@ -74,9 +74,13 @@ $EC2 = 4;  # Default 4kJ/mol
 
 # Input arguments
 $mol=$ARGV[0];  
+print "$mol\n";
 $DataDir=$ARGV[1];
+print "$DataDir\n";
 $CmdDir=$ARGV[2];
+print "$CmdDir\n";
 $uhix=$ARGV[3];
+print "$uhix\n";
 
 # optional arguments
 $atom1=$ARGV[4];
@@ -86,13 +90,16 @@ $toldist=$ARGV[6];
  
 chomp($mol);
 
+#use Term::ANSIColor;
 
 ###################################################################################
 #                                       Round3                                    #
 ###################################################################################
+#print color 'green';
 print "###################################################################################\n";
 print "#                                       Round3                                    #\n";
 print "###################################################################################\n";
+#print color 'reset';
 
 if ($uhix ne "0") {
     $uhixx=$uhix - 1;  #look at previously run jobs

@@ -74,8 +74,11 @@ $EC2 = 4;  # Default 4kJ/mol
 
 # Input arguments
 $mol = $ARGV[0];  
+print "$mol\n";
 $DataDir = $ARGV[1];
+print "$DataDir\n";
 $CmdDir = $ARGV[2];
+print "$CmdDir\n";
 
 # Optional arguments (all must be given if used)
 $atom1 = $ARGV[3];
@@ -85,12 +88,15 @@ $toldist = $ARGV[6];
 
 chomp($mol);
 
+#use Term::ANSIColor;
 ###################################################################################
 #                                       Round2                                    #
 ###################################################################################
+#print color 'green';
 print "###################################################################################\n";
 print "#                                       Round2                                    #\n";
 print "###################################################################################\n";
+#print color 'reset'; 
 
 system("cat $DataDir/CF-$mol.round1 | sort | uniq > $DataDir/CF-$mol.done");
 open done, "$DataDir/CF-$mol.done" or die $!;
@@ -156,7 +162,7 @@ if ($l ne "1"){
 
     # submits array of jobs based on input file list $mol.round1 and dependent job which 
     # performs round 2 processing
-    my @args = ("$CmdDir/subarrayjob", "$DataDir/$mol.round2", "$CmdDir", "$CmdDir/EDTS_autorun_part3.pl $mol $DataDir $CmdDir 0 $atom1 $atom2 $gooddist $toldist");
+    my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round2", "$CmdDir", "$CmdDir/EDTS_autorun_part3.pl $mol $DataDir $CmdDir 0 $atom1 $atom2 $gooddist $toldist");
     exec("/bin/bash", @args) == 0 or die "system @args failed: $?";
 }
 else {

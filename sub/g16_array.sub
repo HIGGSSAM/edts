@@ -16,4 +16,5 @@ module load gaussian/16-avx
 #SET YOUR GUASSIAN SCRATCH DIR ON THE BEEGFS
 export GAUSS_SCRDIR=/users/$USER/parallel_scratch
 
-bash -c $(head -n $SLURM_ARRAY_TASK_ID $1 | tail -n 1)
+#echo "bash -c '$(head -n $SLURM_ARRAY_TASK_ID $1 | tail -n 1)'" >> /users/m15631/confsearch/1.txt
+bash -c "$(head -n $SLURM_ARRAY_TASK_ID $1 | tail -n 1)"
