@@ -22,7 +22,7 @@ do
 done
 
 # submitting gaussian array job
-echo 'sbatch --array=1-'$length' '$2'/sub/g16_array.sub '$2'/g16/g16_array.txt > '$2'/g16/job_id.txt' >> ./1.txt
+echo 'sbatch --array=1-'$length' '$2'/sub/g16_array.sub '$2'/g16/g16_array.txt > '$2'/g16/job_id.txt' >> '$2'/g16/log.txt
 sbatch --array=1-"$length" $2/sub/g16_array.sub $2/g16/g16_array.txt > $2/g16/job_id.txt
 
 ###### Dependant perl script submission.
@@ -33,5 +33,5 @@ sbatch --array=1-"$length" $2/sub/g16_array.sub $2/g16/g16_array.txt > $2/g16/jo
 dep=$(cat ./g16/job_id.txt | cut -d " " -f 4)
 echo $dep
 
-echo sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $3 >> ./1.txt
+echo sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $3 >> '$2'/g16/log.txt
 sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $3
