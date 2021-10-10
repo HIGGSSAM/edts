@@ -2,33 +2,37 @@
 
 # get the current working directory; $PWD
 # get users home directory; $HOME
+echo $PWD
+echo $HOME
 
 # check for lib folder 
-if [ -d $HOME/lib]
+if [ -d $HOME"/lib" ]
 then
+    echo $HOME"/lib"
     # removing old version on edts
-    if [ -d $HOME/lib/edts]
+    if [ -d $HOME"/lib/edts" ]
     then
-        if $PWD != $HOME/lib/edts
+        echo $HOME"/lib/edts"
+        if [ $PWD != $HOME"/lib/edts" ]
         then
-           rm -rf $HOME/lib/edts
+           rm -rf $HOME"/lib/edts"
         fi
     fi    
 else
-    mkdir $Home/lib
+    mkdir -p $Home"/lib"
 fi
 
 # copy code into the lib folder
-if $PWD != $HOME/lib/edts
-then   
-    cp $PWD $HOME/lib
+if [ $PWD != $HOME"/lib/edts" ]
+then
+    cp -r $PWD $HOME"/lib"
 fi    
 
 # check for bin folder
-if [ ! -d $HOME/bin]
+if [ ! -d $HOME"/bin" ]
 then 
     # create link to code in bin directory 
-    mkdir $HOME/bin
+    mkdir -p $HOME"/bin"
 fi  
 
 # compling fortran code
@@ -42,15 +46,18 @@ chmod +x $HOME/lib/edts/*.pl
 chmod +x $HOME/lib/edts/lib/*.pl
 module unload Perl/5.24.0-GCC-5.4.0-2.26
 
-ln -s $HOME/lib/edts/ConfMaker $HOME/bin/ConfMaker
+ln -sf $HOME/lib/edts/ConfMaker $HOME/bin/ConfMaker
 #NOTE change to rotabond.pl when added. 
-ln -s $HOME/lib/edts/EDTS_autorun_part1.pl $HOME/bin/EDTS
+ln -sf $HOME/lib/edts/EDTS_autorun_part1.pl $HOME/bin/EDTS
 
-if $PWD != $HOME/lib/edts
+if [ $PWD != $HOME"/lib/edts" ] 
 then
-    dir=$($pwd)
+    echo "does this work"
+    dir=$(echo $PWD)
+    echo $dir
     cd $HOME
-    rm -rf $dir
+    echo $PWD
+    #rm -rf $dir
 fi
 
 # END FILE
