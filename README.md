@@ -26,7 +26,7 @@ Program | Version
 --------- | ----------
 Slurm Workload Manager | == 17.02.1-2
 Gaussian | == 16
-gcc | >= 5.4.0-2.26
+GCC | == 7.1.0-2.28
 perl | == 5.24.0
 
 * Support for GAMESS, NWChem and orca is currently unavailable.
@@ -37,35 +37,26 @@ Installation can be done through cloning either with HTTPS or SSH.
 
 ``` shell
 git clone https://gitlab.eps.surrey.ac.uk/m15631/edts.git
-cd EDTS
+cd ./edts
+bash config
+cd ..
+rm -rf ./edts
 ```
 ## Usage 
 
 ### ConfMaker.f
 
 ``` shell
-# load in the gcc module (the GNU Compiler Collection; https://gcc.gnu.org/)
-module load GCC/7.1.0-2.28
-
-# to compile fortran code
-gfortran ConfMaker.f -O3 -o ./ConfMaker -ffixed-line-length-132
-
-# to execute
-$ ./ConfMaker $mol
+# to execute Confmaker
+$ ConfMaker $mol
 ```
 * This requires the optimised geometry in a zmat format and saved as $mol.zmat and a $mol.input file containing all the desired rotated diheral angles.
-* the .input Formate can be found in ConfMaker.f
+* the .input format can be found in ConfMaker.f
 
 ### EDTS_autorun_part1-3.pl
 
 ``` shell
-# load in the perl compiler
-module load Perl/5.24.0-GCC-5.4.0-2.26
-
-# change the mode of all perl scripts to executables from within the directory contain EDTS perl scripts.
-chmod +x *.pl
-
-# to execute
-./EDTS_autorun_part1.pl $mol 
+# to execute EDTS
+EDTS $mol 
 ```
 * all data files should be saved in the subdirectory ./g16
