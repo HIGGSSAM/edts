@@ -171,18 +171,19 @@ while ($r1uh = <r1uh>){
         system("sort $DataDir/CF-$mol.order.uniq | uniq > $DataDir/CF-$mol.round3-$uhi.tosub");
         system("cat $DataDir/CF-$mol.round3-$uhi.tosub >> $DataDir/CF-$mol.round3");     
 
-        $uhi++; 
+        #$uhi++; 
         print ".....Beginning round 3-$uhi...\n\n";
 
         # insert fail save if .tosub file is empty.
 
         if (-z "$DataDir/CF-$mol.round3-$uhi.tosub"){
             $uhix++;
-        }else{
-        # submits array of jobs based on input file list $mol.round1 and dependent job which 
-        # performs round 2 processing
-        my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round3-$uhi.tosub", "$CmdDir", "$CmdDir/EDTS_autorun_part3.pl $mol $DataDir $CmdDir $uhi $atom1 $atom2 $gooddist $toldist");
-        exec("/bin/bash", @args) == 0 or die "system @args failed: $?";
+        }
+        else{
+            # submits array of jobs based on input file list $mol.round1 and dependent job which 
+            # performs round 2 processing
+            my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round3-$uhi.tosub", "$CmdDir", "$CmdDir/EDTS_autorun_part3.pl $mol $DataDir $CmdDir $uhi $atom1 $atom2 $gooddist $toldist");
+            exec("/bin/bash", @args) == 0 or die "system @args failed: $?";
         }
     }
     $uhi++;

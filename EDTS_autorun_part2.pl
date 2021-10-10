@@ -113,15 +113,15 @@ close done;
 my @args = ("CF-$mol.round1", "$EC1","$DataDir", "$CmdDir", "$Nmax", "$atom1", "$atom2", "$goodist", "$toldist");
 system($^X, "$CmdDir/lib/edts_opteng.pl", @args) == 0 or die "system @args failed: $?";
 
-system("wc $DataDir/CF-$mol.round1.lh > $DataDir/CF-$mol.round1.ll");
-open(lengthx, '<', "$DataDir/CF-$mol.round1.ll") or die $!;
+#system("wc $DataDir/CF-$mol.round1.lh > $DataDir/CF-$mol.round1.ll");
+open(lengthx, '<', "$DataDir/CF-$mol.round1.lh") or die $!;
 
 #alternate code replacing while and read operation then change $1 ne "1" to $engcount ne "1"
-#$engcount++ while (<lengthx>)
-while ($asd = readline(lengthx)){
-    @crapl=split(/\s+/,$asd);
-    $l = $crapl[1];
-} 
+$engcount++ while (<lengthx>);
+#while ($asd = readline(lengthx)){
+#    @crapl=split(/\s+/,$asd);
+#    $l = $crapl[1];
+#} 
 close lengthx;
 
 my @args = ("CF-$mol.round1.uh", "$DataDir");
@@ -131,8 +131,11 @@ system($^X, "$CmdDir/lib/edts_squeeze.pl", @args) == 0 or die "system @args fail
 
 # Yes there are more than one energy like conformations (case $1 ne 1) so for
 # half of the space perform full conformational search
-if ($l ne "1"){
- 
+#if ($l ne "1"){
+if ($engcount ne "1"){
+
+    print ".....Round 2 performing full conformational search on half the space...\n\n";
+
     # for half the space (INT(Nrot/2) perform full conformational search
     my @args = ("CF-$mol.round1.lh", "$DataDir");
     system($^X, "$CmdDir/lib/edts_squeeze.pl", @args) == 0 or die "system @args failed: $?";
