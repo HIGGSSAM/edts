@@ -50,14 +50,14 @@ ln -sf $HOME/lib/edts/ConfMaker $HOME/bin/ConfMaker
 #NOTE change to rotabond.pl when added. 
 ln -sf $HOME/lib/edts/EDTS_autorun_part1.pl $HOME/bin/EDTS
 
-if [ $PWD != $HOME"/lib/edts" ] 
-then
-    echo "does this work"
-    dir=$(echo $PWD)
-    echo $dir
-    cd $HOME
-    echo $PWD
-    #rm -rf $dir
-fi
+#if [ $PWD != $HOME"/lib/edts" ] 
+#then
+#    echo "does this work"
+#    dir=$(echo $PWD)
+#    echo $dir
+#    cd $HOME
+#    echo $PWD
+#    #rm -rf $dir
+#fi
 
 # END FILE
