@@ -75,10 +75,10 @@ $EC2 = 4;  # Default 4kJ/mol
 # Input arguments
 $mol = $ARGV[0];  
 print "$mol\n";
-$DataDir = $ARGV[1];
-print "$DataDir\n";
-$CmdDir = $ARGV[2];
+$CmdDir = $ARGV[1];
 print "$CmdDir\n";
+$DataDir = $ARGV[2];
+print "$DataDir\n";
 
 # Optional arguments (all must be given if used)
 $atom1 = $ARGV[3];
@@ -165,7 +165,7 @@ if ($engcount ne "1"){
 
     # submits array of jobs based on input file list $mol.round1 and dependent job which 
     # performs round 2 processing
-    my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round2", "$CmdDir", "$CmdDir/EDTS_autorun_part3.pl $mol $DataDir $CmdDir 0 $atom1 $atom2 $gooddist $toldist");
+    my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round2", "$CmdDir", "DataDir", "$CmdDir/EDTS_autorun_part3.pl $mol $CmdDir $DataDir 0 $atom1 $atom2 $gooddist $toldist");
     exec("/bin/bash", @args) == 0 or die "system @args failed: $?";
 }
 else {
@@ -177,7 +177,7 @@ else {
     }
     system("touch $DataDir/CF-$mol.round2 $DataDir/CF-$mol.round3");
 
-    my @args = ("$CmdDir/EDTS_autorun_part3.pl", "$mol", "$CmdDir", "$CmdDir", "0", "$atom1", "$atom2", "$gooddist", "$toldist");
+    my @args = ("$CmdDir/EDTS_autorun_part3.pl", "$mol", "$DataDir", "$CmdDir", "0", "$atom1", "$atom2", "$gooddist", "$toldist");
     exec("/bin/bash",@args) == 0 or die "system @args failed: $?";
 }
 

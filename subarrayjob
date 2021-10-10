@@ -2,6 +2,12 @@
 
 ###### Gaussian Array submission.
 
+echo $0
+echo $1
+echo $2
+echo $3
+echo $4
+
 # round #num file that contains a list of all conformers to be submitted
 
 inp=$(cat $1);
@@ -18,12 +24,12 @@ for x in $inp;
 do
     # print out command line to new sub file
     echo "$x";
-    echo 'g16 -c="0-27" < '$2'/g16/'$x'.gjf > '$2'/g16/'$x'.out' >> ./g16/g16_array.txt
+    echo 'g16 -c="0-27" < '$3'/'$x'.gjf > '$3'/'$x'.out' >> $3/g16_array.txt
 done
 
 # submitting gaussian array job
-echo 'sbatch --array=1-'$length' '$2'/sub/g16_array.sub '$2'/g16/g16_array.txt > '$2'/g16/job_id.txt' >> '$2'/g16/log.txt
-sbatch --array=1-"$length" $2/sub/g16_array.sub $2/g16/g16_array.txt > $2/g16/job_id.txt
+echo 'sbatch --array=1-'$length' '$2'/sub/g16_array.sub '$3'/g16_array.txt > '$3'/job_id.txt' >> $3/log.txt
+sbatch --array=1-"$length" $2/sub/g16_array.sub $3/g16_array.txt > $3/job_id.txt
 
 ###### Dependant perl script submission.
 
@@ -33,5 +39,5 @@ sbatch --array=1-"$length" $2/sub/g16_array.sub $2/g16/g16_array.txt > $2/g16/jo
 dep=$(cat ./g16/job_id.txt | cut -d " " -f 4)
 echo $dep
 
-echo sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $3 >> '$2'/g16/log.txt
-sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $3
+echo sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $4 >> $3/log.txt
+sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $4

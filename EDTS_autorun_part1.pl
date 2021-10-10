@@ -122,10 +122,12 @@ my $CmdDir = dirname($CmdFile);
 #$CmdDir = getcwd; 
 
 # path to gaussian file directory
-$DataDir = "$CmdDir/g16";
+use Cwd;
+$DataDir = cwd;
+$DataDir = "$DataDir/g16";
 
-#print "$DataDir\n";
-#print "$CmdDir\n";
+print "$CmdDir\n";
+print "$DataDir\n";
 
 if (-e "$DataDir/log.txt") {
     system("rm $DataDir/log.txt");
@@ -162,7 +164,7 @@ close comlist;
 
 # submits array of jobs based on input file list $mol.round1 and dependent job which 
 # performs round 2 processing
-my @args = ("$CmdDir/subarrayjob", "$file", "$CmdDir", "$CmdDir/EDTS_autorun_part2.pl $mol $DataDir $CmdDir $atom1 $atom2 $gooddist $toldist");
+my @args = ("$CmdDir/subarrayjob", "$file", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part2.pl $mol $CmdDir $DataDir $atom1 $atom2 $gooddist $toldist");
 exec ("/bin/bash", @args) == 0 or die "system @args failed: $?"
 
 __END__
