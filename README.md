@@ -48,7 +48,8 @@ rm -rf ./edts
 
 ``` shell
 # to execute Confmaker
-$ ConfMaker $mol
+module load GCC/7.1.0-2.28
+ConfMaker $mol
 ```
 * This requires the optimised geometry in a zmat format and saved as $mol.zmat and a $mol.input file containing all the desired rotated diheral angles.
 * the .input format can be found in ConfMaker.f
@@ -57,6 +58,7 @@ $ ConfMaker $mol
 
 ``` shell
 # to execute EDTS
+module load Perl/5.24.0-GCC-5.4.0-2.26 
 EDTS $mol 
 ```
 * all data files should be saved in the subdirectory ./g16
