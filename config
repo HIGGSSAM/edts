@@ -25,7 +25,7 @@ fi
 # copy code into the lib folder
 if [ $PWD != $HOME"/lib/edts" ]
 then
-    cp -r $PWD $HOME"/lib"
+    cp -r $PWD $HOME"/lib/edts"
 fi    
 
 # check for bin folder
