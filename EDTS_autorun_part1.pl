@@ -67,11 +67,11 @@ $|++;
 #
 ######################################################################################
 
-use Term::ANSIColor;
+#use Term::ANSIColor;
 #print color 'blue';
-print "###################################################################################\n"; 
-print "#                                        EDTS                                     #\n";
-print "###################################################################################\n\n"; 
+printoutput "###################################################################################\n"; 
+printoutput "#                                        EDTS                                     #\n";
+printoutput "###################################################################################\n\n"; 
 #print color 'reset';
 
 # Defaults
@@ -88,30 +88,33 @@ $atom2=$ARGV[2];
 
 if ($ARGV[1]){
     if (!$ARGV[3] ){
-        print "No appropriate bond length specified, 1.33 A will be used.\n";
-        print "No appropriate bond length tolerance specified, 0.00 A will be used.\n";
+        printoutput "No appropriate bond length specified, 1.33 A will be used.\n";
+        printoutput "No appropriate bond length tolerance specified, 0.00 A will be used.\n";
         $gooddist=1.33;
         $toldist=0.00;
     }
     else{
         $gooddist=$ARGV[3];
-        print "Bond length specified at $gooddist A.\n";
+        printoutput "Bond length specified at $gooddist A.\n";
         if (!$ARGV[4]){
-            print "No appropriate bond length tolerance specified, 0.00 A has been used.\n";
+            printoutput "No appropriate bond length tolerance specified, 0.00 A has been used.\n";
             $toldist=0.00;
         }
         else{
             $toldist=$ARGV[4];
-            print "Bond length tolerance specified at $toldist A.\n";
+            printoutput "Bond length tolerance specified at $toldist A.\n";
         }
     }
 
 }
 chomp($mol);
 
-print "\n";
-print "Conformer search for $mol.\n";
-print "\n";
+# remove any previous log file called $mol.log
+if (-e "$DataDir/$mol.log") {
+    system("rm $DataDir/$mol.log");
+}
+
+printoutput "\nConformer search for $mol.\n";
 
 use Cwd 'abs_path';
 use File::Basename;
@@ -126,8 +129,8 @@ use Cwd;
 $DataDir = cwd;
 $DataDir = "$DataDir/g16";
 
-print "$CmdDir\n";
-print "$DataDir\n";
+printoutput "$CmdDir\n";
+printoutput "$DataDir\n";
 
 if (-e "$DataDir/log.txt") {
     system("rm $DataDir/log.txt");
@@ -137,9 +140,9 @@ if (-e "$DataDir/log.txt") {
 #                                       Round1                                    #
 ###################################################################################
 #print color 'green';
-print "###################################################################################\n"; 
-print "#                                       Round1                                    #\n";
-print "###################################################################################\n"; 
+printoutput "###################################################################################\n"; 
+printoutput "#                                       Round1                                    #\n";
+printoutput "###################################################################################\n"; 
 #print color 'reset';
 
 # create a list of individual rotations for first round of optimisation
@@ -147,7 +150,7 @@ $file = "$DataDir/CF-$mol.round1";
 #print "$file\n";
 
 if (-e $file) {
-    print "Old file found, removing $file\n";
+    printoutput "Old file found, removing $file\n";
     system("rm $file");
 }
 
@@ -166,6 +169,23 @@ close comlist;
 # performs round 2 processing
 my @args = ("$CmdDir/subarrayjob", "$file", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part2.pl $mol $CmdDir $DataDir $atom1 $atom2 $gooddist $toldist");
 exec ("/bin/bash", @args) == 0 or die "system @args failed: $?"
+
+# subroutine to echo STDOUT to mol.log file
+# change print to printoutput above
+
+sub printoutput {
+    my $text = @_;
+    
+    #print to STDOUT
+    print $text;
+
+    # append text to logfile called mol.log
+    # open/print/close approach ensures log text flush to disk/ viewable as script runs through
+    open(mollog,'>>', "$DataDir/$mol.log") or die $!;
+    print mollog $text;
+    close mollog;
+}
+
 
 __END__
 
