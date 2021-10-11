@@ -14,10 +14,10 @@ inp=$(cat $1);
 length=$(cat $1 | wc -l)
 
 # remove sub array txt file. 
-rm -f ./g16/g16_array.txt
+rm -f $3/g16_array.txt
 
 # remove dep job id  txt file. 
-rm -f ./g16/job_id.txt
+rm -f $3/job_id.txt
 
 # for each inputted conformer
 for x in $inp;
@@ -36,7 +36,7 @@ sbatch --array=1-"$length" $2/sub/g16_array.sub $3/g16_array.txt > $3/job_id.txt
 # dependant job to be run after array of conformers is completed
 
 # save dependant array job id to $dep variable
-dep=$(cat ./g16/job_id.txt | cut -d " " -f 4)
+dep=$(cat $3/job_id.txt | cut -d " " -f 4)
 echo $dep
 
 echo sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $4 >> $3/log.txt

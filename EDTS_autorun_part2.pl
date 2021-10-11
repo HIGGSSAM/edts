@@ -165,7 +165,7 @@ if ($engcount ne "1"){
 
     # submits array of jobs based on input file list $mol.round1 and dependent job which 
     # performs round 2 processing
-    my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round2", "$CmdDir", "DataDir", "$CmdDir/EDTS_autorun_part3.pl $mol $CmdDir $DataDir 0 $atom1 $atom2 $gooddist $toldist");
+    my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round2", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part3.pl $mol $CmdDir $DataDir 0 $atom1 $atom2 $gooddist $toldist");
     exec("/bin/bash", @args) == 0 or die "system @args failed: $?";
 }
 else {
