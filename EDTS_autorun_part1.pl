@@ -67,13 +67,6 @@ $|++;
 #
 ######################################################################################
 
-#use Term::ANSIColor;
-#print color 'blue';
-printoutput "###################################################################################\n"; 
-printoutput "#                                        EDTS                                     #\n";
-printoutput "###################################################################################\n\n"; 
-#print color 'reset';
-
 # Defaults
 $Nmax = 5;  # Default
 $EC1 = 3;  # Default 3kJ/mol
@@ -88,33 +81,26 @@ $atom2=$ARGV[2];
 
 if ($ARGV[1]){
     if (!$ARGV[3] ){
-        printoutput "No appropriate bond length specified, 1.33 A will be used.\n";
-        printoutput "No appropriate bond length tolerance specified, 0.00 A will be used.\n";
+        printoutput("No appropriate bond length specified, 1.33 A will be used.\n");
+        printoutput("No appropriate bond length tolerance specified, 0.00 A will be used.\n");
         $gooddist=1.33;
         $toldist=0.00;
     }
     else{
         $gooddist=$ARGV[3];
-        printoutput "Bond length specified at $gooddist A.\n";
+        printoutput("Bond length specified at $gooddist A.\n");
         if (!$ARGV[4]){
-            printoutput "No appropriate bond length tolerance specified, 0.00 A has been used.\n";
+            printoutput("No appropriate bond length tolerance specified, 0.00 A has been used.\n");
             $toldist=0.00;
         }
         else{
             $toldist=$ARGV[4];
-            printoutput "Bond length tolerance specified at $toldist A.\n";
+            printoutput("Bond length tolerance specified at $toldist A.\n");
         }
     }
 
 }
 chomp($mol);
-
-# remove any previous log file called $mol.log
-if (-e "$DataDir/$mol.log") {
-    system("rm $DataDir/$mol.log");
-}
-
-printoutput "\nConformer search for $mol.\n";
 
 use Cwd 'abs_path';
 use File::Basename;
@@ -129,8 +115,23 @@ use Cwd;
 $DataDir = cwd;
 $DataDir = "$DataDir/g16";
 
-printoutput "$CmdDir\n";
-printoutput "$DataDir\n";
+$log = "$DataDir/$mol.log";
+# remove any previous log file called $mol.log
+if (-e "$DataDir/$mol.log") {
+    system("rm $DataDir/$mol.log");
+}
+
+#use Term::ANSIColor;
+#print color 'blue';
+printoutput($log, "###################################################################################\n"); 
+printoutput($log, "#                                        EDTS                                     #\n");
+printoutput($log, "###################################################################################\n\n"); 
+#print color 'reset';
+
+printoutput($log, "Conformer search for $mol.\n");
+
+#printoutput($log, "\n $CmdDir\n");
+printoutput($log, "Data directory: $DataDir\n");
 
 if (-e "$DataDir/log.txt") {
     system("rm $DataDir/log.txt");
@@ -140,9 +141,9 @@ if (-e "$DataDir/log.txt") {
 #                                       Round1                                    #
 ###################################################################################
 #print color 'green';
-printoutput "###################################################################################\n"; 
-printoutput "#                                       Round1                                    #\n";
-printoutput "###################################################################################\n"; 
+printoutput($log, "###################################################################################\n"); 
+printoutput($log, "#                                       Round1                                    #\n");
+printoutput($log, "###################################################################################\n\n"); 
 #print color 'reset';
 
 # create a list of individual rotations for first round of optimisation
@@ -150,7 +151,7 @@ $file = "$DataDir/CF-$mol.round1";
 #print "$file\n";
 
 if (-e $file) {
-    printoutput "Old file found, removing $file\n";
+    printoutput($log, "Old .round1 file found, removing $file\n");
     system("rm $file");
 }
 
@@ -167,6 +168,7 @@ close comlist;
 
 # submits array of jobs based on input file list $mol.round1 and dependent job which 
 # performs round 2 processing
+printoutput($log, "Submitting round 1 jobs ...\n");
 my @args = ("$CmdDir/subarrayjob", "$file", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part2.pl $mol $CmdDir $DataDir $atom1 $atom2 $gooddist $toldist");
 exec ("/bin/bash", @args) == 0 or die "system @args failed: $?"
 
@@ -174,15 +176,18 @@ exec ("/bin/bash", @args) == 0 or die "system @args failed: $?"
 # change print to printoutput above
 
 sub printoutput {
-    my $text = @_;
-    
+    #my $text = @_;
+    my ($q,$j) = @_;
     #print to STDOUT
-    print $text;
-
+    #print "$text\n";
+    print "$j";
+    
     # append text to logfile called mol.log
     # open/print/close approach ensures log text flush to disk/ viewable as script runs through
-    open(mollog,'>>', "$DataDir/$mol.log") or die $!;
-    print mollog $text;
+    
+    #print "$log\n";
+    open(mollog, '>>', "$q") or die $!;
+    print mollog $j;
     close mollog;
 }
 

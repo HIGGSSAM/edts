@@ -74,11 +74,8 @@ $EC2 = 4;  # Default 4kJ/mol
 
 # Input arguments
 $mol = $ARGV[0];  
-print "$mol\n";
 $CmdDir = $ARGV[1];
-print "$CmdDir\n";
 $DataDir = $ARGV[2];
-print "$DataDir\n";
 
 # Optional arguments (all must be given if used)
 $atom1 = $ARGV[3];
@@ -88,14 +85,19 @@ $toldist = $ARGV[6];
 
 chomp($mol);
 
+$log = "$DataDir/$mol.log";
+printoutput($log, "$mol\n");
+#printoutput($log, "$CmdDir\n");
+printoutput($log, "$DataDir\n");
+
 #use Term::ANSIColor;
 ###################################################################################
 #                                       Round2                                    #
 ###################################################################################
 #print color 'green';
-print "###################################################################################\n";
-print "#                                       Round2                                    #\n";
-print "###################################################################################\n";
+printoutput($log, "###################################################################################\n");
+printoutput($log, "#                                       Round2                                    #\n");
+printoutput($log, "###################################################################################\n");
 #print color 'reset'; 
 
 system("cat $DataDir/CF-$mol.round1 | sort | uniq > $DataDir/CF-$mol.done");
@@ -134,7 +136,7 @@ system($^X, "$CmdDir/lib/edts_squeeze.pl", @args) == 0 or die "system @args fail
 #if ($l ne "1"){
 if ($engcount ne "1"){
 
-    print ".....Round 2 performing full conformational search on half the space...\n\n";
+    printoutput($log, ".....Round 2 performing full conformational search on half the space...\n\n");
 
     # for half the space (INT(Nrot/2) perform full conformational search
     my @args = ("CF-$mol.round1.lh", "$DataDir");
@@ -165,11 +167,12 @@ if ($engcount ne "1"){
 
     # submits array of jobs based on input file list $mol.round1 and dependent job which 
     # performs round 2 processing
+    printoutput($log, "Submitting round 2 jobs ...\n");
     my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round2", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part3.pl $mol $CmdDir $DataDir 0 $atom1 $atom2 $gooddist $toldist");
     exec("/bin/bash", @args) == 0 or die "system @args failed: $?";
 }
 else {
-    print ".....Moving to round 3...\n\n";
+    printoutput($log, "Moving to round 3...\n\n");
 
     # initialise round 3 file
     if (-e "$DataDir/CF-$mol.round3"){
@@ -177,8 +180,27 @@ else {
     }
     system("touch $DataDir/CF-$mol.round2 $DataDir/CF-$mol.round3");
 
-    my @args = ("$CmdDir/EDTS_autorun_part3.pl", "$mol", "$DataDir", "$CmdDir", "0", "$atom1", "$atom2", "$gooddist", "$toldist");
+    my @args = ("$CmdDir/EDTS_autorun_part3.pl", "$mol", "$CmdDir", "$DataDir", "0", "$atom1", "$atom2", "$gooddist", "$toldist");
     exec("/bin/bash",@args) == 0 or die "system @args failed: $?";
+}
+
+# subroutine to echo STDOUT to mol.log file
+# change print to printoutput above
+
+sub printoutput {
+    #my $text = @_;
+    my ($q,$j) = @_;
+    #print to STDOUT
+    #print "$text\n";
+    print "$j";
+    
+    # append text to logfile called mol.log
+    # open/print/close approach ensures log text flush to disk/ viewable as script runs through
+    
+    #print "$log\n";
+    open(mollog, '>>', "$q") or die $!;
+    print mollog $j;
+    close mollog;
 }
 
 __END__

@@ -38,7 +38,7 @@ $|++;
 #
 #     $ ConfSearch $mol [$atom1 $atom2] [$gooddist] [$toldist]
 #
-# NOTE [] are for transition state optimisation, if r12 is fixed, this can be used to help determine the optimised geometry is valid.                                        #
+# NOTE [] are for transition state optimisation, if r12 is fixed, this can be used to help determine the optimised geometry is valid.                    #
 #                                                                          
 #  REQUIREMENTS 
 #
@@ -74,13 +74,13 @@ $EC2 = 4;  # Default 4kJ/mol
 
 # Input arguments
 $mol=$ARGV[0];  
-print "$mol\n";
+#print "$mol\n";
 $CmdDir=$ARGV[1];
-print "$CmdDir\n";
+#print "$CmdDir\n";
 $DataDir=$ARGV[2];
-print "$DataDir\n";
+#print "$DataDir\n";
 $uhix=$ARGV[3];
-print "$uhix\n";
+#print "$uhix\n";
 
 # optional arguments
 $atom1=$ARGV[4];
@@ -90,15 +90,21 @@ $toldist=$ARGV[6];
  
 chomp($mol);
 
+$log = "$DataDir/$mol.log";
+printoutput($log, "$mol\n");
+#printoutput($log, "$CmdDir\n");
+printoutput($log, "$DataDir\n");
+printoutput($log, "$uhix\n");
+
 #use Term::ANSIColor;
 
 ###################################################################################
 #                                       Round3                                    #
 ###################################################################################
 #print color 'green';
-print "###################################################################################\n";
-print "#                                       Round3                                    #\n";
-print "###################################################################################\n";
+printoutput($log, "###################################################################################\n");
+printoutput($log, "#                                       Round3                                    #\n");
+printoutput($log, "###################################################################################\n");
 #print color 'reset';
 
 if ($uhix ne "0") {
@@ -138,7 +144,7 @@ while ($r1uh = <r1uh>){
         }
         #print "uhi=$uhi\n";
         #print "uhix=$uhix\n";
-        print("cat $DataDir/CF-$mol.round1 $DataDir/CF-$mol.round2 $DataDir/CF-$mol.round3 | sort | uniq > $DataDir/CF-$mol.done\n");
+        #print("cat $DataDir/CF-$mol.round1 $DataDir/CF-$mol.round2 $DataDir/CF-$mol.round3 | sort | uniq > $DataDir/CF-$mol.done\n");
         system("cat $DataDir/CF-$mol.round1 $DataDir/CF-$mol.round2 $DataDir/CF-$mol.round3 | sort | uniq > $DataDir/CF-$mol.done");
        
         #system("cat $DataDir/CF-$mol.round1 $DataDir/CF-$mol.round2 | sort | uniq > $DataDir/CF-$mol.done");
@@ -171,18 +177,16 @@ while ($r1uh = <r1uh>){
         system("sort $DataDir/CF-$mol.order.uniq | uniq > $DataDir/CF-$mol.round3-$uhi.tosub");
         system("cat $DataDir/CF-$mol.round3-$uhi.tosub >> $DataDir/CF-$mol.round3");     
 
-        #$uhi++; 
-        print ".....Beginning round 3-$uhi...\n\n";
+        $uhix++; 
+        printoutput($log, "Beginning round 3-$uhix\n");
 
         # insert fail save if .tosub file is empty.
 
-        if (-z "$DataDir/CF-$mol.round3-$uhi.tosub"){
-            $uhix++;
-        }
-        else{
+        if (-s "$DataDir/CF-$mol.round3-$uhi.tosub"){
             # submits array of jobs based on input file list $mol.round1 and dependent job which 
             # performs round 2 processing
-            my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round3-$uhi.tosub", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part3.pl $mol $DataDir $CmdDir $uhi $atom1 $atom2 $gooddist $toldist");
+            printoutput($log, "Submitting round 3-$uhix jobs ...\n");
+            my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round3-$uhi.tosub", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part3.pl $mol $CmdDir $DataDir $uhix $atom1 $atom2 $gooddist $toldist");
             exec("/bin/bash", @args) == 0 or die "system @args failed: $?";
         }
     }
@@ -197,6 +201,6 @@ system($^X, "$CmdDir/lib/edts_opteng.pl", @args) == 0 or die "system @args faile
 
 # remove temp files  NOTE do "*.gp from group.pl" and "*.i  from combine.pl" files also need clearing?
 system("rm $DataDir/CF-$mol.*order* $DataDir/CF-$mol.*sq* $DataDir/CF-$mol.*.ll");
-print ".....Conformer search complete.\n\n";
+printoutput($log,  "$mol Conformer search complete.\n\n");
 
 __END__
