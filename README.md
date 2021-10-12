@@ -48,6 +48,8 @@ rm -rf ./edts
 
 ``` shell
 # to execute Confmaker
+mkdir g16
+cd ./g16
 module load GCC/7.1.0-2.28
 ConfMaker $mol
 ```
@@ -58,6 +60,7 @@ ConfMaker $mol
 
 ``` shell
 # to execute EDTS
+# NOTE from the directory above g16
 module load Perl/5.24.0-GCC-5.4.0-2.26 
 EDTS $mol 
 ```
