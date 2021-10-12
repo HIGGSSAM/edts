@@ -121,6 +121,9 @@ if (-e "$DataDir/$mol.log") {
     system("rm $DataDir/$mol.log");
 }
 
+system("touch $DataDir/$mol.log");
+
+
 #use Term::ANSIColor;
 #print color 'blue';
 printoutput($log, "###################################################################################\n"); 
