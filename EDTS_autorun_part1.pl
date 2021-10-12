@@ -170,7 +170,7 @@ close comlist;
 # performs round 2 processing
 printoutput($log, "Submitting round 1 jobs ...\n");
 my @args = ("$CmdDir/subarrayjob", "$file", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part2.pl $mol $CmdDir $DataDir $atom1 $atom2 $gooddist $toldist");
-exec ("/bin/bash", @args) == 0 or die "system @args failed: $?"
+exec ("/bin/bash", @args) == 0 or die "system @args failed: $?";
 
 # subroutine to echo STDOUT to mol.log file
 # change print to printoutput above

@@ -203,4 +203,24 @@ system($^X, "$CmdDir/lib/edts_opteng.pl", @args) == 0 or die "system @args faile
 system("rm $DataDir/CF-$mol.*order* $DataDir/CF-$mol.*sq* $DataDir/CF-$mol.*.ll");
 printoutput($log,  "$mol Conformer search complete.\n\n");
 
+# subroutine to echo STDOUT to mol.log file
+# change print to printoutput above
+
+sub printoutput {
+    #my $text = @_;
+    my ($q,$j) = @_;
+    #print to STDOUT
+    #print "$text\n";
+    print "$j";
+    
+    # append text to logfile called mol.log
+    # open/print/close approach ensures log text flush to disk/ viewable as script runs through
+    
+    #print "$log\n";
+    open(mollog, '>>', "$q") or die $!;
+    print mollog $j;
+    close mollog;
+}
+
+
 __END__
