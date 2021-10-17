@@ -126,7 +126,7 @@ C   The third-eighth column is the degrees (in real number) you are rotating. Yo
            j = i
            exit
        endif
-       enddo
+      enddo
 
        open(40,file='zmat.part1',status='unknown')
        if (ts .eq. 'Y') then
@@ -301,7 +301,6 @@ C   The third-eighth column is the degrees (in real number) you are rotating. Yo
                write(5,'(''EPS=6.02'')')
            endif
            write(5,'(''Radii=UAKS'')')
-           write(5,'(''SCFVAC'')')
            write(5,*)
        endif
 
