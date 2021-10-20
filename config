@@ -49,6 +49,8 @@ module unload Perl/5.24.0-GCC-5.4.0-2.26
 ln -sf $HOME/lib/edts/ConfMaker $HOME/bin/ConfMaker
 #NOTE change to rotabond.pl when added. 
 ln -sf $HOME/lib/edts/EDTS_autorun_part1.pl $HOME/bin/EDTS
+ln -sf $HOME/lib/edts/sub/restartjob.sh $HOME/bin/RESTART EDTS
+
 
 #if [ $PWD != $HOME"/lib/edts" ] 
 #then

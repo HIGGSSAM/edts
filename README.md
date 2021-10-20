@@ -65,3 +65,13 @@ module load Perl/5.24.0-GCC-5.4.0-2.26
 EDTS $mol 
 ```
 * all data files should be saved in the subdirectory ./g16
+
+### Restarting EDTS after a gaussain error.
+* Once you have fixed the gaussian error and have a compplete .out file
+``` shell
+# to execute restart EDTS
+# NOTE from the directory containing the restart file or give the full path to the directory contain the restart file
+module load Perl/5.24.0-GCC-5.4.0-2.26 
+RESTART EDTS $<optional path> 
+```
+
