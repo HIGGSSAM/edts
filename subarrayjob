@@ -39,5 +39,8 @@ sbatch --array=1-"$length" $2/sub/g16_array.sub $3/g16_array.txt > $3/job_id.txt
 dep=$(cat $3/job_id.txt | cut -d " " -f 4)
 echo $dep
 
+# save dependent job details to restart file for manual restarting after issue gaussian calcs. no dependency required.
+echo sbatch $2/sub/perl_job.sub $4 > $3/restart
+
 echo sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $4 >> $3/log.txt
 sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $4

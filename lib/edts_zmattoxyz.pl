@@ -51,6 +51,10 @@ use Text::Wrap;
 
 #declarations:
 
+$TargetFileFormat = $ARGV[0];
+$SourceFile = $ARGV[1];
+$LogFile = $ARGV[2];                 #optional if run interactively
+print ("$TargetFileFormat\n");
 
 $grid="INT(grid=ultrafine)"; 
 #$grid="";
@@ -59,34 +63,36 @@ if(@ARGV <2){
     die "More arguments needed.\nSyntax: crin [output format] $mol.[ext] $diffuse $temp  \n";
 }
 
-$job = $ARGV[0];
+open(logfile, '>>', "$LogFile") or die $!;
+
+$job = $TargetFileFormat;
 if($job =~ /xyz/i  ) {$output_type="gaussian";}
 else         {die "unsupported output type $job.\n";}
 
 # ARGV[2] is the diffuse fun switch
-if (!$ARGV[2] or $ARGV[2] =~ /0/){
-    #print "no diffuse function\n";
-    $basis = "6-31G*";
-    $genbasis = "6-31Gd";
-    $heavybasis = "lacvp + polarisation + ecp";
-}
-else{
-    print "add diffuse function\n";
-    $basis = "6-31+G*";
-    $genbasis = "6-31pGd";
-    $heavybasis = "lacvp + polarisation + diffuse + ecp";
-}
-if (!$ARGV[3]){
-    $temperature = 298.15;
-}
-else{
-    $temperature = $ARGV[3];
-}
+#if (!$ARGV[2] or $ARGV[2] =~ /0/){
+#    #print "no diffuse function\n";
+#    $basis = "6-31G*";
+#    $genbasis = "6-31Gd";
+#    $heavybasis = "lacvp + polarisation + ecp";
+#}
+#else{
+#    print "add diffuse function\n";
+#    $basis = "6-31+G*";
+#    $genbasis = "6-31pGd";
+#    $heavybasis = "lacvp + polarisation + diffuse + ecp";
+#}
+#if (!$ARGV[3]){
+#    $temperature = 298.15;
+#}
+#else{
+#    $temperature = $ARGV[3];
+#}
 
 #check to see all of the files exist
 
 #strip the geometries from whatever the input file is.
-$inputfile = $ARGV[1];
+$inputfile = $SourceFile;
 if ($inputfile =~  /\.out/ ){
     if($inputfile =~  /\.298\.mecn\.out/ and $job =~ /mecn/i){
         $inputfile_stripped = stripname($inputfile,"\.298\.mecn\.out");
@@ -96,13 +102,13 @@ if ($inputfile =~  /\.out/ ){
     }
     $geometry = striparc($inputfile,0);				# get geometry string
     if ($geometry eq ""){
-        print "Caution! $inputfile This is not optimised geometry!\n";
+        printoutput ($LogFile, "Caution! $inputfile This is not optimised geometry!\n");
         $stripped_geometry = striplastxyz($inputfile);
-        print("$stripped_geometry");
+        printoutput ($LogFile, "$stripped_geometry");
     }
     else{
         $stripped_geometry = stripcom($geometry);
-	print("$stripped_geometry");			# cull leading and trailing rubbish
+	printoutput ($LogFile, "$stripped_geometry");			# cull leading and trailing rubbish
     }
     @atom = split(/\n/,$stripped_geometry);
     #@atomline = split(/\n/,$stripped_geometry);
@@ -121,7 +127,7 @@ if ($inputfile =~  /\.out/ ){
 }
 
 else {
-    print "Unknown file extension. Supported filetypes: .out (Gaussian)\n";
+    printoutput ($LogFile, "Unknown file extension. Supported filetypes: .out (Gaussian)\n");
     die;
 }
 
@@ -159,7 +165,7 @@ if ($output_type eq "gaussian"){
     if($job =~  /xyz/i)   {writedeck($finaldeck,$inputfile_stripped.".xyz");}
 }
 
-
+close(logfile);
 
 sub stripcom{
 #stripcom("geometry_string"), returns stripped geometry string.
@@ -457,6 +463,20 @@ sub check_geometry_type{
     return $iszmat;
 }
 
-
+sub printoutput {
+    #my $text = @_;
+    my ($q,$j) = @_;
+    #print to STDOUT
+    #print "$text\n";
+    print "$j";
+    
+    # append text to logfile called mol.log
+    # open/print/close approach ensures log text flush to disk/ viewable as script runs through
+    
+    #print "$log\n";
+    open(mollog, '>>', "$q") or die $!;
+    print mollog $j;
+    close mollog;
+}
 
 __END__

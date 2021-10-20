@@ -12,15 +12,19 @@ $|++;
 use Data::Dumper;
 
 $roundlist = $ARGV[0];
-#print("$roundlist\n");
 $window = $ARGV[1];
 $DataDir = $ARGV[2];
 $CmdDir = $ARGV[3];
-$atom1 = $ARGV[5];
-$atom2 = $ARGV[6];
-$gooddist = $ARGV[7];
-$toldist = $ARGV[8];
-$Nmax = $ARGV[4];
+$LogFile = $ARGV[4];
+$Nmax = $ARGV[5];
+$atom1 = $ARGV[6];
+$atom2 = $ARGV[7];
+$gooddist = $ARGV[8];
+$toldist = $ARGV[9];
+
+#print("$DataDir/$roundlist\n");
+
+    open(logfile, '>>', "$LogFile") or die $!;
 
     $count = 0;
 #   my ($roundlist,$window) = @_;
@@ -44,7 +48,7 @@ $Nmax = $ARGV[4];
 	    #print Dumper $eng[$count];
             
             if ($atom1){
-                system($^X, "$CmdDir/edts_zmattoxyz.pl", "xyz", "$DataDir/$i.out");
+                system($^X, "$CmdDir/edts_zmattoxyz.pl", "xyz", "$DataDir/$i.out", $LogFile);
                 open(xyzfile, '<', "$DataDir/$i.xyz") or die $!;
                 readline(xyzfile);
                 readline(xyzfile);
@@ -62,6 +66,7 @@ $Nmax = $ARGV[4];
 
                 if ( $bonddist[$count] >= $gooddist+$toldist or $bonddist[$count] <= $gooddist-$toldist){
                     print("AHHHH\n");
+                    print logfile ("AHHHH\n");
                     $eng[$count] = 0.0;
                 }
                 #print "$dih[$count] , $bonddist[$count]\n";
@@ -129,12 +134,20 @@ $Nmax = $ARGV[4];
     printf "Lowest energy conformer is %s \t%f Hartree\n", $sortdih[0], $sorteng[0];
     printf "The next lowest is %s \t+%f kJ/mol\n", $sortdih[1] ,$Lowest ;
     print "-----------------------------------------------------------\n";
-    }
+    print logfile "\n-----------------------------------------------------------\n";
+    printf logfile "Lowest energy conformer is %s \t%f Hartree\n", $sortdih[0], $sorteng[0];
+    printf logfile "The next lowest is %s \t+%f kJ/mol\n", $sortdih[1] ,$Lowest ;
+    print logfile "-----------------------------------------------------------\n";
+     }
     else {
         print "\n-----------------------------------------------------------\n";
         printf "Lowest 1 = %s \t%f Hartree\n", $sortdih[0], $sorteng[0];
         printf "No other conformer has energy less than %.2fkJ/mol\n", $window;
         print "-----------------------------------------------------------\n";
+        print logfile "\n-----------------------------------------------------------\n";
+        printf logfile "Lowest 1 = %s \t%f Hartree\n", $sortdih[0], $sorteng[0];
+        printf logfile "No other conformer has energy less than %.2fkJ/mol\n", $window;
+        print logfile "-----------------------------------------------------------\n";
         printf flh "Lowest 1 = %s \t%f\n", $sortdih[0], $Deng[0];
         printf fla "Lowest 1   = %s \t%f kJ/mol or %f Hartree\n", $sortdih[0], $Deng[0], $sorteng[0];
         printf flw "Less than %.2fkJ/mol= %s \t%f\n", $window, $sortdih[0], $Deng[0];
@@ -151,6 +164,6 @@ $Nmax = $ARGV[4];
     close(fuh);
 
 
-
+    close(logfile);
 
 __END__

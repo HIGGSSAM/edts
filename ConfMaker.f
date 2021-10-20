@@ -130,6 +130,10 @@ C   The third-eighth column is the degrees (in real number) you are rotating. Yo
 
        open(40,file='zmat.part1',status='unknown')
        if (ts .eq. 'Y') then
+
+C      to insert additional line before route section in zmat.part1 for mem option, eg %mem=1Gb use
+           write(40,'(A)') "%mem=100GB"
+
            write(40,'(A,A,A,A,A)') "#", trim(theory), "/",trim(basis), " INT(grid=ultrafine) 
      $     OPT=(TS,calcfc,noeigentest,maxcyc=200,z-matrix)"
            if (gas .eq. 'N') then
@@ -140,6 +144,10 @@ C   The third-eighth column is the degrees (in real number) you are rotating. Yo
                endif
            endif
        else
+
+C      to insert additional line before route section in zmat.part1 for mem option, eg %mem=1Gb use
+           write(40,'(A)') "%mem=100GB"
+
            write(40,'(A,A,A,A,A)') "#", trim(theory),  "/",trim(basis)," INT(grid=ultrafine) OPT" 
            if (gas .eq. 'N') then
                if (solvent .eq. 'ea') then

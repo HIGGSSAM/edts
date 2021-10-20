@@ -105,14 +105,14 @@ open done, "$DataDir/CF-$mol.done" or die $!;
 while ($done = <done>){
     chomp($done);
     foreach $y ($done){
-        my @args = ("$y", "$DataDir", "$CmdDir","$atom1", "$atom2", "$goodist", "$toldist");
+        my @args = ("$y", "$DataDir", "$CmdDir","$log", "$atom1", "$atom2", "$goodist", "$toldist");
         system($^X, "$CmdDir/lib/edts_TScheck.pl", @args) == 0 or die "system @args failed: $?";
         }
     }
 close done;
 
 # Rank the energies of optimised conformations
-my @args = ("CF-$mol.round1", "$EC1","$DataDir", "$CmdDir", "$Nmax", "$atom1", "$atom2", "$goodist", "$toldist");
+my @args = ("CF-$mol.round1", "$EC1","$DataDir", "$CmdDir", "$log", "$Nmax", "$atom1", "$atom2", "$goodist", "$toldist");
 system($^X, "$CmdDir/lib/edts_opteng.pl", @args) == 0 or die "system @args failed: $?";
 
 #system("wc $DataDir/CF-$mol.round1.lh > $DataDir/CF-$mol.round1.ll");

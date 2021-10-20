@@ -113,7 +113,7 @@ if ($uhix ne "0") {
     while ($R3tosub = <R3tosub>){
     chomp($R3tosub);
         foreach $y ($R3tosub){
-            my @args = ("$y", "$DataDir", "$CmdDir","$atom1", "$atom2", "$goodist", "$toldist");
+            my @args = ("$y", "$DataDir", "$CmdDir", "$log", "$atom1", "$atom2", "$goodist", "$toldist");
             system($^X, "$CmdDir/lib/edts_TScheck.pl", @args) == 0 or die "system @args failed: $?";
         }
     }
@@ -124,7 +124,7 @@ else{
     while ($round2 = <round2>){
     chomp($round2);
         foreach $y ($round2){
-            my @args = ("$y", "$DataDir", "$CmdDir","$atom1", "$atom2", "$goodist", "$toldist");
+            my @args = ("$y", "$DataDir", "$CmdDir", "$log", "$atom1", "$atom2", "$goodist", "$toldist");
             system($^X, "$CmdDir/lib/edts_TScheck.pl", @args) == 0 or die "system @args failed: $?";
         }
     }
@@ -150,7 +150,7 @@ while ($r1uh = <r1uh>){
         #system("cat $DataDir/CF-$mol.round1 $DataDir/CF-$mol.round2 | sort | uniq > $DataDir/CF-$mol.done");
         #system("cat $DataDir/CF-$mol.round3 | sort | uniq >> $DataDir/CF-$mol.done");
        
-        my @args = ("CF-$mol.done", "$EC2","$DataDir", "$CmdDir", "$Nmax", "$atom1", "$atom2", "$goodist", "toldist");
+        my @args = ("CF-$mol.done", "$EC2","$DataDir", "$CmdDir", "$log", "$Nmax", "$atom1", "$atom2", "$goodist", "toldist");
         system($^X, "$CmdDir/lib/edts_opteng.pl", @args) == 0 or die "system @args failed: $?";
 
         my @args = ("CF-$mol.done.window", "CF-$mol.round1.uh.sq.$uhix", "$DataDir", "$mol");
@@ -196,7 +196,7 @@ close r1uh;
 system("cat $DataDir/CF-$mol.round1 $DataDir/CF-$mol.round2 $DataDir/CF-$mol.round3 | sort | uniq > $DataDir/CF-$mol.done");
 
 # pick lowest conformation 
-my @args = ("CF-$mol.done", "$EC2", "$DataDir", "$CmdDir", "Nmax", "$atom1", "$atom2", "$goodist", "toldist");
+my @args = ("CF-$mol.done", "$EC2", "$DataDir", "$CmdDir", "$log", "Nmax", "$atom1", "$atom2", "$goodist", "toldist");
 system($^X, "$CmdDir/lib/edts_opteng.pl", @args) == 0 or die "system @args failed: $?";
 
 # remove temp files  NOTE do "*.gp from group.pl" and "*.i  from combine.pl" files also need clearing?

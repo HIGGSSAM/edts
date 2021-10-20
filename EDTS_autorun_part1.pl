@@ -79,27 +79,7 @@ $mol=$ARGV[0];
 $atom1=$ARGV[1];
 $atom2=$ARGV[2];
 
-if ($ARGV[1]){
-    if (!$ARGV[3] ){
-        printoutput("No appropriate bond length specified, 1.33 A will be used.\n");
-        printoutput("No appropriate bond length tolerance specified, 0.00 A will be used.\n");
-        $gooddist=1.33;
-        $toldist=0.00;
-    }
-    else{
-        $gooddist=$ARGV[3];
-        printoutput("Bond length specified at $gooddist A.\n");
-        if (!$ARGV[4]){
-            printoutput("No appropriate bond length tolerance specified, 0.00 A has been used.\n");
-            $toldist=0.00;
-        }
-        else{
-            $toldist=$ARGV[4];
-            printoutput("Bond length tolerance specified at $toldist A.\n");
-        }
-    }
 
-}
 chomp($mol);
 
 use Cwd 'abs_path';
@@ -116,12 +96,37 @@ $DataDir = cwd;
 $DataDir = "$DataDir/g16";
 
 $log = "$DataDir/$mol.log";
+
 # remove any previous log file called $mol.log
 if (-e "$DataDir/$mol.log") {
     system("rm $DataDir/$mol.log");
 }
 
 system("touch $DataDir/$mol.log");
+
+
+if ($ARGV[1]){
+    if (!$ARGV[3] ){
+        printoutput($log, "No appropriate bond length specified, 1.33 A will be used.\n");
+        printoutput($log, "No appropriate bond length tolerance specified, 0.00 A will be used.\n");
+        $gooddist=1.33;
+        $toldist=0.00;
+    }
+    else{
+        $gooddist=$ARGV[3];
+        printoutput($log, "Bond length specified at $gooddist A.\n");
+        if (!$ARGV[4]){
+            printoutput($log, "No appropriate bond length tolerance specified, 0.00 A has been used.\n");
+            $toldist=0.00;
+        }
+        else{
+            $toldist=$ARGV[4];
+            printoutput($log, "Bond length tolerance specified at $toldist A.\n");
+        }
+    }
+
+}
+
 
 
 #use Term::ANSIColor;
