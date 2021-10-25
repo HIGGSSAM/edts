@@ -9,22 +9,24 @@ $|++;
 #    my $file = shift(@_);
 
 $file =$ARGV[0];
-$DataDir = $ARGV[1];
-$CmdDir = $ARGV[2];
-$LogFile = $ARGV[3];
-$atom1=$ARGV[4];
-$atom2=$ARGV[5];
-$gooddist = $ARGV[6];
-$toldist = $ARGV[7];
+$mol = $ARGV[1];
+$DataDir = $ARGV[2];
+$CmdDir = $ARGV[3];
+$LogFile = $ARGV[4];
+$atom1=$ARGV[5];
+$atom2=$ARGV[6];
+$gooddist = $ARGV[7];
+$toldist = $ARGV[8];
 
 
     open(logfile, '>>', "$LogFile") or die $!;
 
     $jobdone =-2 ;
 
-    open(ifh,'<',"$DataDir/$file.out") or die $!;
+    open(results, '>>', "$DataDir/CF-$mol.TScheck.results") or die $!;
+    open(ifh, '<', "$DataDir/$file.out") or die $!;
     if ($atom1){ #doing ts
-        system("$CmdDir/edts_zmattoxyz.pl xyz $DataDir/$file.out $LogFile");
+        system("$CmdDir/lib/edts_zmattoxyz.pl xyz $DataDir/$file.out $LogFile");
         open(xyzfile,'<', "$DataDir/$file.xyz") or die $!;
         readline(xyzfile);
         readline(xyzfile);
@@ -48,29 +50,41 @@ $toldist = $ARGV[7];
     while ($line = readline(ifh)) {
         if ($line=~ /Normal/){
             $jobdone=1;
+            print results "$file: Terminated normally\n";
         }
         elsif ($line=~ /Address/){
             $jobdone=-1;
+            print results "$file: Error = Address Error, resubmit the job\n";
         }
         elsif ($line=~ /kill/){
             $jobdone=-2;
+            print results "$file: Error = killed, resubmit the job\n";
+        }
+        elsif ($line=~ /Error termination req/){
+            $jobdone=-3;
+            print results "$file: Error = error termination\n";
         }
     }
     close (ifh);
+    close (results);
+
+#print "Datafile=\n$DataDir/$file.out\n";
+#print "Logfile=$LogFile\n";
+#print "Jobdone=$jobdone\n";
 
     if (($jobdone <=-2) ) { 
         if ($atom1){
             if ( $bondlength<= $gooddist+$toldist and $bondlength >= $gooddist-$toldist){
-                printf "%s killed, no resubmit\t %5.2f\t(within %5.2f-%5.2f )\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
-                printf logfile "%s killed, no resubmit\t %5.2f\t(within %5.2f-%5.2f )\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf "%s killed, no resubmit\t %5.2f\t(within %5.2f-%5.2f )\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf logfile "%s killed, no resubmit\t %5.2f\t(within %5.2f-%5.2f )\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
                 $resub = "N";  # maybe yes
                 #system("mailx -s 'Resubmit $file (killed), bond length is $bondlength within $gooddist-$toldist and $gooddist-$toldist' $email < $file.xyz ") ;
                 print("Resubmit $file (killed), bond length is $bondlength within $gooddist-$toldist and $gooddist-$toldist");
                 print logfile ("Resubmit $file (killed), bond length is $bondlength within $gooddist-$toldist and $gooddist-$toldist");
             }
             else{
-                printf "%s killed, no resubmit\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
-                printf logfile "%s killed, no resubmit\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf "%s killed, no resubmit\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf logfile "%s killed, no resubmit\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
                 $resub = "N";
                 #system("mailx -s 'NO Resubmit $file (killed), bond length is $bondlength shorter than $gooddist-$toldist or longer than $gooddist+$toldist' $email < $file.xyz ") ;
                 print("NO Resubmit $file (killed), bond length is $bondlength shorter than $gooddist-$toldist or longer than $gooddist+$toldist");
@@ -78,11 +92,20 @@ $toldist = $ARGV[7];
             }
         }
         else{
-            #printf "%s killed, resubmit the job\n",$DataDir/$file; 
-            #$resub = "Y";
-            printf "%s killed, No resubmit the job\n",$DataDir/$file; 
-            printf logfile "%s killed, No resubmit the job\n",$DataDir/$file; 
-            $resub = "N";
+            if (($jobdone ==-2) ) {
+                #printf "%s killed, resubmit the job\n",$DataDir/$file; 
+                #$resub = "Y";
+                printf "%s killed, resubmit the job\n",$DataDir/$file; 
+                printf logfile "%s killed, resubmit the job\n",$DataDir/$file; 
+                $resub = "N";
+            }
+            else{
+                #printf "%s killed, resubmit the job\n",$DataDir/$file; 
+                #$resub = "Y";
+                printf "%s Gaussian Error termination, No resubmit the job\n\n",$file; 
+                printf logfile "%s Gaussian Error termination, No resubmit the job\n\n",$file; 
+                $resub = "N";
+            }
 
         }
         if ($resub eq "Y"){
@@ -93,16 +116,16 @@ $toldist = $ARGV[7];
     elsif (($jobdone ==-1) ) { 
         if ($atom1){
             if ( $bondlength<= $gooddist+$toldist and $bondlength >= $gooddist-$toldist){
-                printf "%s Address Error, resubmit\t %5.2f\t(within %5.2f- %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
-                printf logfile "%s Address Error, resubmit\t %5.2f\t(within %5.2f- %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf "%s Address Error, resubmit\t %5.2f\t(within %5.2f- %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf logfile "%s Address Error, resubmit\t %5.2f\t(within %5.2f- %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
                 $resub = "N"; # maybe yes
                 #system("mailx -s 'Resubmit $file (Address Error), bond length is $bondlength (within $gooddist-$toldist and $gooddist +$toldist), but we adivice you to check what causes this Address Error Termination' $email < $file.xyz ") ;
                 print("Resubmit $file (Address Error), bond length is $bondlength (within $gooddist-$toldist and $gooddist +$toldist), but we adivice you to check what causes this Address Error Termination");
                 print logfile ("Resubmit $file (Address Error), bond length is $bondlength (within $gooddist-$toldist and $gooddist +$toldist), but we adivice you to check what causes this Address Error Termination");
             }
             else{
-                printf "%s Address Error, no resubmit\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
-                printf logfile "%s Address Error, no resubmit\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf "%s Address Error, no resubmit\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf logfile "%s Address Error, no resubmit\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
                 $resub = "N";
                 #system("mailx -s 'NO Resubmit $file (Address Error), bond length is $bondlength (shorter than $gooddist -$toldist or longer than $gooddist+$toldist), ' $email < $file.xyz ") ;
                 print("NO Resubmit $file (Address Error), bond length is $bondlength (shorter than $gooddist -$toldist or longer than $gooddist+$toldist)");
@@ -112,8 +135,8 @@ $toldist = $ARGV[7];
         else{
             #printf "%s  Address Error, resubmit the job\n",$DataDir/$file; 
             #$resub = "Y";
-            printf "%s  Address Error, No resubmit the job\n",$DataDir/$file; 
-            printf logfile "%s  Address Error, No resubmit the job\n",$DataDir/$file; 
+            printf "%s  Address Error, resubmit the job\n",$file; 
+            printf logfile "%s  Address Error, resubmit the job\n",$file; 
             $resub = "N";
         }
         if ($resub eq "Y"){
@@ -125,14 +148,14 @@ $toldist = $ARGV[7];
         if ($atom1){
             if ( $bondlength<= $gooddist+$toldist and $bondlength >= $gooddist-$toldist){
                 #print color 'green';
-                printf "%s terminated normally\t %5.2f\t(within %5.2f- %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
-                printf logfile "%s terminated normally\t %5.2f\t(within %5.2f- %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf "%s terminated normally\t %5.2f\t(within %5.2f- %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf logfile "%s terminated normally\t %5.2f\t(within %5.2f- %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
                 #print color 'reset';
             }
             else{
                 #print color 'green';
-                printf "%s terminated normally.\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
-                printf logfile "%s terminated normally.\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$DataDir/$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf "%s terminated normally.\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
+                printf logfile "%s terminated normally.\t %5.2f\t(shorter than %5.2f or longer than %5.2f)\n",$file,$bondlength,$gooddist-$toldist,$gooddist+$toldist;
                 #print color 'reset';
             }
         }
@@ -145,6 +168,6 @@ $toldist = $ARGV[7];
         #return 0;
     }
 
-    close(logfile);
+    close (logfile);
 
 __END__

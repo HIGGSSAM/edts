@@ -1,0 +1,164 @@
+###################################################################################
+#                                        EDTS                                     #
+###################################################################################
+
+Conformer search for test.
+Data directory: /home/geoffh/EDTS/energy-direct_tree_search/g16
+
+###################################################################################
+#                                       Round1                                    #
+###################################################################################
+
+Old .round1 file found, removing /home/geoffh/EDTS/energy-direct_tree_search/g16/CF-test.round1
+Submitting round 1 jobs ...
+test.a1
+test.a2
+test.a1b2
+test.a1b3
+test.a1c2
+test.a1c3
+test.a1d2
+
+###################################################################################
+#                                        EDTS                                     #
+###################################################################################
+
+Conformer search for test.
+Data directory: ./g16
+
+###################################################################################
+#                                       Round2                                    #
+###################################################################################
+test.a1 terminated normally.
+
+test.a1b2 terminated normally.
+
+test.a1b3 terminated normally.
+
+test.a1c2 terminated normally.
+
+test.a1c3 terminated normally.
+
+test.a1d2 terminated normally.
+
+test.a2 terminated normally.
+
+
+-----------------------------------------------------------
+Lowest energy conformer is a1b2 	-613.547293 Hartree
+The next lowest is a1b3 	+0.311573 kJ/mol
+-----------------------------------------------------------
+.....Round 2 performing full conformational search on half the space...
+
+Submitting round 2 jobs ...
+test.a2b2
+test.a2b3
+
+###################################################################################
+#                                        EDTS                                     #
+###################################################################################
+
+Conformer search for test.
+Data directory: ./g16
+
+###################################################################################
+#                                  Round3 - stage 1                               #
+###################################################################################
+test.a2b2 terminated normally.
+
+test.a2b3 terminated normally.
+
+
+-----------------------------------------------------------
+Lowest energy conformer is a2b3 	-613.547795 Hartree
+The next lowest is a2b2 	+1.187099 kJ/mol
+-----------------------------------------------------------
+Submitting round 3-2 jobs ...
+test.a1b2c3
+test.a1b3c3
+test.a2b2c3
+test.a2b3c3
+
+###################################################################################
+#                                        EDTS                                     #
+###################################################################################
+
+Conformer search for test.
+Data directory: ./g16
+
+###################################################################################
+#                                  Round3 - stage 2                               #
+###################################################################################
+test.a1b2c3 terminated normally.
+
+test.a1b3c3 terminated normally.
+
+test.a2b2c3 terminated normally.
+
+test.a2b3c3 terminated normally.
+
+
+-----------------------------------------------------------
+Lowest energy conformer is a2b2c3 	-613.548489 Hartree
+The next lowest is a1b2c3 	+0.000016 kJ/mol
+-----------------------------------------------------------
+Submitting round 3-3 jobs ...
+test.a2b3c2
+
+###################################################################################
+#                                        EDTS                                     #
+###################################################################################
+
+Conformer search for test.
+Data directory: ./g16
+
+###################################################################################
+#                                  Round3 - stage 3                               #
+###################################################################################
+test.a2b3c2 terminated normally.
+
+
+-----------------------------------------------------------
+Lowest energy conformer is a2b2c3 	-613.548489 Hartree
+The next lowest is a1b2c3 	+0.000016 kJ/mol
+-----------------------------------------------------------
+No new jobs to submit during round 3-4 ...
+
+-----------------------------------------------------------
+Lowest energy conformer is a2b2c3 	-613.548489 Hartree
+The next lowest is a1b2c3 	+0.000016 kJ/mol
+-----------------------------------------------------------
+Submitting round 3-5 jobs ...
+test.a1b2c3d2
+test.a1b3c3d2
+test.a2b2c3d2
+test.a2b3d2
+
+###################################################################################
+#                                        EDTS                                     #
+###################################################################################
+
+Conformer search for test.
+Data directory: ./g16
+
+###################################################################################
+#                                  Round3 - stage 5                               #
+###################################################################################
+test.a1b2c3d2 terminated normally.
+
+test.a1b3c3d2 terminated normally.
+
+test.a2b2c3d2 terminated normally.
+
+test.a2b3d2 terminated normally.
+
+
+-----------------------------------------------------------
+Lowest energy conformer is a2b2c3 	-613.548489 Hartree
+The next lowest is a1b2c3 	+0.000016 kJ/mol
+-----------------------------------------------------------
+
+************************************************
+     Conformer search completed for test
+************************************************
+

@@ -74,13 +74,9 @@ $EC2 = 4;  # Default 4kJ/mol
 
 # Input arguments
 $mol=$ARGV[0];  
-#print "$mol\n";
 $CmdDir=$ARGV[1];
-#print "$CmdDir\n";
 $DataDir=$ARGV[2];
-#print "$DataDir\n";
 $uhix=$ARGV[3];
-#print "$uhix\n";
 
 # optional arguments
 $atom1=$ARGV[4];
@@ -91,21 +87,26 @@ $toldist=$ARGV[6];
 chomp($mol);
 
 $log = "$DataDir/$mol.log";
-printoutput($log, "$mol\n");
+#printoutput($log, "$mol\n");
 #printoutput($log, "$CmdDir\n");
-printoutput($log, "$DataDir\n");
-printoutput($log, "$uhix\n");
+#printoutput($log, "$DataDir\n");
+#printoutput($log, "$uhix\n");
 
-#use Term::ANSIColor;
+$curround=$uhix + 1;
+printoutput($log, "\n###################################################################################\n"); 
+printoutput($log, "#                                        EDTS                                     #\n");
+printoutput($log, "###################################################################################\n\n"); 
 
-###################################################################################
-#                                       Round3                                    #
-###################################################################################
-#print color 'green';
+printoutput($log, "Conformer search for $mol.\n");
+printoutput($log, "Data directory: $DataDir\n\n");
 printoutput($log, "###################################################################################\n");
-printoutput($log, "#                                       Round3                                    #\n");
+printoutput($log, "#                                  Round3 - stage $curround                               #\n");
 printoutput($log, "###################################################################################\n");
-#print color 'reset';
+
+# initialise round 3 file
+if (-e "$DataDir/CF-$mol.TScheck.results"){
+   system("/bin/rm $DataDir/CF-$mol.TScheck.results");
+}
 
 if ($uhix ne "0") {
     $uhixx=$uhix - 1;  #look at previously run jobs
@@ -113,7 +114,7 @@ if ($uhix ne "0") {
     while ($R3tosub = <R3tosub>){
     chomp($R3tosub);
         foreach $y ($R3tosub){
-            my @args = ("$y", "$DataDir", "$CmdDir", "$log", "$atom1", "$atom2", "$goodist", "$toldist");
+            my @args = ("$y", "$mol", "$DataDir", "$CmdDir", "$log", "$atom1", "$atom2", "$goodist", "$toldist");
             system($^X, "$CmdDir/lib/edts_TScheck.pl", @args) == 0 or die "system @args failed: $?";
         }
     }
@@ -124,11 +125,34 @@ else{
     while ($round2 = <round2>){
     chomp($round2);
         foreach $y ($round2){
-            my @args = ("$y", "$DataDir", "$CmdDir", "$log", "$atom1", "$atom2", "$goodist", "$toldist");
+            my @args = ("$y", "$mol", "$DataDir", "$CmdDir", "$log", "$atom1", "$atom2", "$goodist", "$toldist");
             system($^X, "$CmdDir/lib/edts_TScheck.pl", @args) == 0 or die "system @args failed: $?";
         }
     }
     close round2;
+}
+
+$errcount=0;
+$lnecount=0;
+# count how many TScheck errors detected
+if (-e "$DataDir/CF-$mol.TScheck.results"){
+    open(errcount, '<', "$DataDir/CF-$mol.TScheck.results") or die $!;
+    while ($line = <errcount>){
+        $linecnt++;
+        if ($line=~ /Error/){
+                $errcount++;
+        }
+    }
+    close errcound;
+    print ("\nErrcount=$errcount of $linecnt\n");
+    # terminate if more than 20% of files errored
+    $errpercent=$errcount/$linecnt*100;
+    #print ("$errpercent");
+    if ($errpercent > 20) {
+        printf "\n*** More than %3.2f % ***\n",$errpercent;
+        print "*** Too many Gaussian errors to continue ***\n\n";
+        exit;
+    }
 }
 
 open (r1uh, "<", "$DataDir/CF-$mol.round1.uh.sq") or die $!;
@@ -142,13 +166,7 @@ while ($r1uh = <r1uh>){
             print r1uhlist $x;
             close r1uhlist;
         }
-        #print "uhi=$uhi\n";
-        #print "uhix=$uhix\n";
-        #print("cat $DataDir/CF-$mol.round1 $DataDir/CF-$mol.round2 $DataDir/CF-$mol.round3 | sort | uniq > $DataDir/CF-$mol.done\n");
         system("cat $DataDir/CF-$mol.round1 $DataDir/CF-$mol.round2 $DataDir/CF-$mol.round3 | sort | uniq > $DataDir/CF-$mol.done");
-       
-        #system("cat $DataDir/CF-$mol.round1 $DataDir/CF-$mol.round2 | sort | uniq > $DataDir/CF-$mol.done");
-        #system("cat $DataDir/CF-$mol.round3 | sort | uniq >> $DataDir/CF-$mol.done");
        
         my @args = ("CF-$mol.done", "$EC2","$DataDir", "$CmdDir", "$log", "$Nmax", "$atom1", "$atom2", "$goodist", "toldist");
         system($^X, "$CmdDir/lib/edts_opteng.pl", @args) == 0 or die "system @args failed: $?";
@@ -162,15 +180,14 @@ while ($r1uh = <r1uh>){
         my @args = ("CF-$mol.window.sq", "$DataDir", "$mol");
         system($^X, "$CmdDir/lib/edts_combine.pl", @args) == 0 or die "system @args failed: $?";
         
-        #system("cat $DataDir/CF-$mol.i | sed 's/\\.//g' |sed 's/\^/CF-$mol./' > $DataDir/CF-$mol.needreorder");
         system("sort $DataDir/CF-$mol.i | sed 's/\^/CF-$mol./' > $DataDir/CF-$mol.order");
-        #system("rm $DataDir/CF-$mol.i");
+        # system("rm $DataDir/CF-$mol.i");
 
         # *** next module redundant use sort instead ***
-        #my @args = ("CF-$mol.needreorder", "$DataDir", "$mol");
-        #system($^X, "$CmdDir/edts_reorder.pl", @args) == 0 or die "system @args failed: $?";
+        # my @args = ("CF-$mol.needreorder", "$DataDir", "$mol");
+        # system($^X, "$CmdDir/edts_reorder.pl", @args) == 0 or die "system @args failed: $?";
         
-        #Before submit round3-1, check if there is anything in DONE!
+        # Before submit round3-1, check if there is anything in DONE!
         my @args = ("CF-$mol.order", "$DataDir", "$mol");
         system($^X, "$CmdDir/lib/edts_recombine.pl",  @args) == 0 or die "system @args failed: $?";
 
@@ -178,16 +195,26 @@ while ($r1uh = <r1uh>){
         system("cat $DataDir/CF-$mol.round3-$uhi.tosub >> $DataDir/CF-$mol.round3");     
 
         $uhix++; 
-        printoutput($log, "Beginning round 3-$uhix\n");
+        #printoutput($log, "Beginning round 3-$uhix\n");
 
         # insert fail save if .tosub file is empty.
-
+        $curround=$uhix + 1;
         if (-s "$DataDir/CF-$mol.round3-$uhi.tosub"){
             # submits array of jobs based on input file list $mol.round1 and dependent job which 
             # performs round 2 processing
-            printoutput($log, "Submitting round 3-$uhix jobs ...\n");
+            
+            printoutput($log, "Submitting round 3-$curround jobs ...\n");
+            open(roundlist, '<', "$DataDir/CF-$mol.round3-$uhi.tosub") or die $!;
+            while ($round=readline(roundlist)){
+                printoutput($log,"$round");
+            }
+            close roundlist;
+
             my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round3-$uhi.tosub", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part3.pl $mol $CmdDir $DataDir $uhix $atom1 $atom2 $gooddist $toldist");
             exec("/bin/bash", @args) == 0 or die "system @args failed: $?";
+        }
+        else{
+            printoutput($log, "No new jobs to submit during round 3-$curround ...\n");
         }
     }
     $uhi++;
@@ -201,7 +228,11 @@ system($^X, "$CmdDir/lib/edts_opteng.pl", @args) == 0 or die "system @args faile
 
 # remove temp files  NOTE do "*.gp from group.pl" and "*.i  from combine.pl" files also need clearing?
 system("rm $DataDir/CF-$mol.*order* $DataDir/CF-$mol.*sq* $DataDir/CF-$mol.*.ll");
-printoutput($log,  "$mol Conformer search complete.\n\n");
+
+
+printoutput($log, "\n************************************************\n"); 
+printoutput($log, "     Conformer search completed for $mol\n");
+printoutput($log, "\************************************************\n\n"); 
 
 # subroutine to echo STDOUT to mol.log file
 # change print to printoutput above

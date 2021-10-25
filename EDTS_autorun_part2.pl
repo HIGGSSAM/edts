@@ -86,44 +86,64 @@ $toldist = $ARGV[6];
 chomp($mol);
 
 $log = "$DataDir/$mol.log";
-printoutput($log, "$mol\n");
-#printoutput($log, "$CmdDir\n");
-printoutput($log, "$DataDir\n");
 
-#use Term::ANSIColor;
-###################################################################################
-#                                       Round2                                    #
-###################################################################################
-#print color 'green';
+printoutput($log, "\n###################################################################################\n"); 
+printoutput($log, "#                                        EDTS                                     #\n");
+printoutput($log, "###################################################################################\n\n"); 
+
+printoutput($log, "Conformer search for $mol.\n");
+printoutput($log, "Data directory: $DataDir\n\n");
+
 printoutput($log, "###################################################################################\n");
 printoutput($log, "#                                       Round2                                    #\n");
 printoutput($log, "###################################################################################\n");
-#print color 'reset'; 
+
+# initialise TSchecks result file
+if (-e "$DataDir/CF-$mol.TScheck.results"){
+    system("/bin/rm $DataDir/CF-$mol.TScheck.results");
+}
 
 system("cat $DataDir/CF-$mol.round1 | sort | uniq > $DataDir/CF-$mol.done");
 open done, "$DataDir/CF-$mol.done" or die $!;
 while ($done = <done>){
     chomp($done);
     foreach $y ($done){
-        my @args = ("$y", "$DataDir", "$CmdDir","$log", "$atom1", "$atom2", "$goodist", "$toldist");
+        my @args = ("$y", "$mol", "$DataDir", "$CmdDir","$log", "$atom1", "$atom2", "$goodist", "$toldist");
+        #print "@args";
         system($^X, "$CmdDir/lib/edts_TScheck.pl", @args) == 0 or die "system @args failed: $?";
         }
     }
 close done;
 
+$errcount=0;
+$lnecount=0;
+# count how many TScheck errors detected
+open(errcount, '<', "$DataDir/CF-$mol.TScheck.results") or die $!;
+while ($line = <errcount>){
+    $linecnt++;
+    if ($line=~ /Error/){
+            $errcount++;
+    }
+}
+close errcound;
+print ("\nErrcount=$errcount of $linecnt\n");
+# terminate if more than 20% of files errored
+$errpercent=$errcount/$linecnt*100;
+#print ("$errpercent");
+if ($errpercent > 20) {
+    printf "\n*** More than %3.2f % ***\n",$errpercent;
+    print "*** Too many Gaussian errors to continue ***\n\n";
+    exit;
+}
+
+
 # Rank the energies of optimised conformations
 my @args = ("CF-$mol.round1", "$EC1","$DataDir", "$CmdDir", "$log", "$Nmax", "$atom1", "$atom2", "$goodist", "$toldist");
 system($^X, "$CmdDir/lib/edts_opteng.pl", @args) == 0 or die "system @args failed: $?";
 
-#system("wc $DataDir/CF-$mol.round1.lh > $DataDir/CF-$mol.round1.ll");
+# count how many energy like conformations found in first optimisation run
 open(lengthx, '<', "$DataDir/CF-$mol.round1.lh") or die $!;
-
-#alternate code replacing while and read operation then change $1 ne "1" to $engcount ne "1"
 $engcount++ while (<lengthx>);
-#while ($asd = readline(lengthx)){
-#    @crapl=split(/\s+/,$asd);
-#    $l = $crapl[1];
-#} 
 close lengthx;
 
 my @args = ("CF-$mol.round1.uh", "$DataDir");
@@ -168,6 +188,12 @@ if ($engcount ne "1"){
     # submits array of jobs based on input file list $mol.round1 and dependent job which 
     # performs round 2 processing
     printoutput($log, "Submitting round 2 jobs ...\n");
+    open(roundlist, '<', "$DataDir/CF-$mol.round2") or die $!;
+    while ($round=readline(roundlist)){
+        printoutput($log,"$round");
+    }
+    close roundlist;
+
     my @args = ("$CmdDir/subarrayjob", "$DataDir/CF-$mol.round2", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part3.pl $mol $CmdDir $DataDir 0 $atom1 $atom2 $gooddist $toldist");
     exec("/bin/bash", @args) == 0 or die "system @args failed: $?";
 }
@@ -181,7 +207,8 @@ else {
     system("touch $DataDir/CF-$mol.round2 $DataDir/CF-$mol.round3");
 
     my @args = ("$CmdDir/EDTS_autorun_part3.pl", "$mol", "$CmdDir", "$DataDir", "0", "$atom1", "$atom2", "$gooddist", "$toldist");
-    exec("/bin/bash",@args) == 0 or die "system @args failed: $?";
+    #print("@args\n\n");
+    exec("/bin/perl",@args) == 0 or die "system @args failed: $?";
 }
 
 # subroutine to echo STDOUT to mol.log file

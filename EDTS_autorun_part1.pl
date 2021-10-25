@@ -128,47 +128,38 @@ if ($ARGV[1]){
 }
 
 
-
-#use Term::ANSIColor;
-#print color 'blue';
 printoutput($log, "###################################################################################\n"); 
 printoutput($log, "#                                        EDTS                                     #\n");
 printoutput($log, "###################################################################################\n\n"); 
-#print color 'reset';
 
 printoutput($log, "Conformer search for $mol.\n");
-
-#printoutput($log, "\n $CmdDir\n");
-printoutput($log, "Data directory: $DataDir\n");
+printoutput($log, "Data directory: $DataDir\n\n");
 
 if (-e "$DataDir/log.txt") {
     system("rm $DataDir/log.txt");
 }
 
-###################################################################################
-#                                       Round1                                    #
-###################################################################################
-#print color 'green';
 printoutput($log, "###################################################################################\n"); 
 printoutput($log, "#                                       Round1                                    #\n");
 printoutput($log, "###################################################################################\n\n"); 
-#print color 'reset';
 
 # create a list of individual rotations for first round of optimisation
 $file = "$DataDir/CF-$mol.round1";
-#print "$file\n";
 
 if (-e $file) {
     printoutput($log, "Old .round1 file found, removing $file\n");
     system("rm $file");
 }
 
-open(comlist,'<', "$DataDir/$mol.list") or die $!;
+printoutput($log, "Submitting round 1 jobs ...\n");
+
+open(comlist,'<', "$DataDir/$mol.list") or die "No $mol.list found in current directory $DataDir  $!\n";
 while ($dih = <comlist>){
     #$dih = $_;  # make code clearer in above assignment
     open(fr, '>>', "$file") or die $!;
     if (length($dih) <4 || (length($dih)<6 && $dih=~/a1/) ){
         print fr "$mol.$dih";
+        printoutput($log,  "$mol.$dih");
     }
     close fr;
 }
@@ -176,7 +167,7 @@ close comlist;
 
 # submits array of jobs based on input file list $mol.round1 and dependent job which 
 # performs round 2 processing
-printoutput($log, "Submitting round 1 jobs ...\n");
+
 my @args = ("$CmdDir/subarrayjob", "$file", "$CmdDir", "$DataDir", "$CmdDir/EDTS_autorun_part2.pl $mol $CmdDir $DataDir $atom1 $atom2 $gooddist $toldist");
 exec ("/bin/bash", @args) == 0 or die "system @args failed: $?";
 
