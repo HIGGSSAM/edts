@@ -42,5 +42,5 @@ echo $dep
 # save dependent job details to restart file for manual restarting after issue gaussian calcs. no dependency required.
 echo sbatch $2/sub/perl_job.sub $4 > $3/restart
 
-echo sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $4 >> $3/log.txt
-sbatch --dependency=afterok:"$dep" $2/sub/perl_job.sub $4
+echo sbatch --dependency=afterany "$dep" $2/sub/perl_job.sub $4 >> $3/log.txt
+sbatch --dependency=afterany:"$dep" $2/sub/perl_job.sub $4
