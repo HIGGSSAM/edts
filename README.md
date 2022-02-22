@@ -1,24 +1,19 @@
 # Energy-direct Tree Search
 
-Version 1.0.0
-
-Roth Group. Department of Chemistry: p.roth@surrey.ac.uk.
-
-Author: Samuel James Higgs: s.higgs@surrey.ac.uk.
-
 ConfMaker.f is the fortran program to generate a full conformational space.
 
 EDTS_autorun_part1-3.pl are perl scripts to implement the Energy-direct tree search (EDTS) algorithm to explore the comformational space of molecule and idetify the global minimum conformer.
 
 __DISCLAMIER__
 
-The following Scripts are edited, updated and bug fixed versions of two seperate scripts; ConfMaker.f and Confsearch.pl.  
+The following scripts are based on, updated and bug fixed versions of two seperate scripts; ConfMaker.f and Confsearch.pl.  
 
 Original Author(s): C.Y. Lin, E.I. Izgorodina, D. Brittain, and K. Zhang
 
 Original script can be found at: https://rsc.anu.edu.au/~mcoote/scripts.php
    
-When using this codes please using the following citation: E. I. Izgorodina , C.Y. Lin, M. L. Coote. Phys. Chem. Chem. Phys. 9, 2507 (2007)
+When publishing findings using this codes please using the following citation:
+* E. I. Izgorodina , C.Y. Lin, M. L. Coote. Phys. Chem. Chem. Phys. 9, 2507 (2007)
 
 ## Compatibility
 
@@ -33,10 +28,9 @@ perl | == 5.24.0
 
 ## Installation 
 
-Installation can be done through cloning either with HTTPS or SSH. 
+Once the repository has been closed run the included config file.
 
 ``` shell
-git clone https://gitlab.eps.surrey.ac.uk/m15631/edts.git
 cd ./edts
 bash config
 cd ..
