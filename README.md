@@ -28,7 +28,7 @@ perl | == 5.24.0
 
 ## Installation 
 
-Once the repository has been closed run the included config file.
+Once the repository has been cloned run the included config file.
 
 ``` shell
 cd ./edts
@@ -48,7 +48,7 @@ module load GCC/7.1.0-2.28
 ConfMaker $mol
 ```
 * This requires the optimised geometry in a zmat format and saved as $mol.zmat and a $mol.input file containing all the desired rotated diheral angles.
-* the .input format can be found in ConfMaker.f
+* The .input format can be found in ConfMaker.f
 
 ### EDTS_autorun_part1-3.pl
 
